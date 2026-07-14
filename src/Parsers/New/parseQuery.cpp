@@ -1,9 +1,8 @@
-#include <strstream>
-
 #include <Parsers/New/parseQuery.h>
 
 #include <Parsers/ASTInsertQuery.h>
 #include <Parsers/New/AST/InsertQuery.h>
+#include <Parsers/New/CharInputStream.h>
 #include <Parsers/New/ClickHouseLexer.h>
 #include <Parsers/New/ClickHouseParser.h>
 #include <Parsers/New/LexerErrorListener.h>
@@ -42,12 +41,7 @@ ASTPtr parseQuery(const char * begin, const char * end, size_t, size_t, const St
 {
     // TODO: do not ignore |max_parser_depth|.
 
-    size_t size = end - begin;
-    std::strstreambuf buffer(begin, size);
-    std::wbuffer_convert<std::codecvt_utf8<wchar_t>> converter(&buffer);
-    std::wistream stream(&converter);
-
-    UnbufferedCharStream input(stream, size);
+    CharInputStream input(begin, end);
     ClickHouseLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     ClickHouseParser parser(&tokens);
